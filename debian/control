@@ -1,0 +1,11 @@
+Source: jmx_log_parser
+Section: mediation/web
+Priority: extra
+Maintainer: Sorin Manolache <sorin.manolache@orange.com>
+Build-Depends: debhelper (>= 5), autoconf, automake, libtool, autotools-dev
+Standards-Version: 3.7.2
+
+Package: jmx_log_parser
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description:
