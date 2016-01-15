@@ -6,45 +6,6 @@ AM_PROG_AR
 
 AC_CONFIG_MACRO_DIR([m4])
 
-AC_DEFUN([APR_CONFIG],
-[
-	APR_FIND_APR([], [], 1, [1])
-
-	if ! test "$apr_found" = "yes"; then
-		AC_MSG_ERROR([no apache runtime libraries])
-	fi
-	APR_INCLUDES=`$apr_config --includes`
-	APR_CXXFLAGS=`$apr_config --cppflags`
-	APR_LIBS=`$apr_config --link-libtool --libs`
-	APR_LDFLAGS=`$apr_config --ldflags`
-
-	AC_SUBST([APR_INCLUDES])
-	AC_SUBST([APR_CXXFLAGS])
-	AC_SUBST([APR_LIBS])
-	AC_SUBST([APR_LDFLAGS])
-])
-
-AC_DEFUN([APU_CONFIG],
-[
-	APR_FIND_APU([], [], 1, [1])
-
-	if ! test "$apu_found" = "yes"; then
-		AC_MSG_ERROR([no pache utils libraries])
-	fi
-	APU_INCLUDES=`$apu_config --includes`
-	APU_LIBS=`$apu_config --link-libtool --libs`
-	APU_LDFLAGS=`$apu_config --ldflags`
-
-	AC_SUBST([APU_INCLUDES])
-	AC_SUBST([APU_LIBS])
-	AC_SUBST([APU_LDFLAGS])
-])
-
-AC_SUBST([APACHE2_INCLUDES], [-I/usr/include/apache2])
-
-APR_CONFIG
-APU_CONFIG
-
 AC_ENABLE_STATIC(no)
 AC_PROG_LIBTOOL
 AM_CONDITIONAL(is_x86_64, [ test "$HOSTTYPE" = x86_64 ])

@@ -668,14 +668,6 @@ build_vendor
 build_cpu
 build
 LIBTOOL
-APU_LDFLAGS
-APU_LIBS
-APU_INCLUDES
-APR_LDFLAGS
-APR_LIBS
-APR_CXXFLAGS
-APR_INCLUDES
-APACHE2_INCLUDES
 am__fastdepCC_FALSE
 am__fastdepCC_TRUE
 CCDEPMODE
@@ -747,7 +739,6 @@ infodir
 docdir
 oldincludedir
 includedir
-runstatedir
 localstatedir
 sharedstatedir
 sysconfdir
@@ -772,8 +763,6 @@ ac_user_opts='
 enable_option_checking
 enable_silent_rules
 enable_dependency_tracking
-with_apr
-with_apr_util
 enable_static
 enable_shared
 with_pic
@@ -834,7 +823,6 @@ datadir='${datarootdir}'
 sysconfdir='${prefix}/etc'
 sharedstatedir='${prefix}/com'
 localstatedir='${prefix}/var'
-runstatedir='${localstatedir}/run'
 includedir='${prefix}/include'
 oldincludedir='/usr/include'
 docdir='${datarootdir}/doc/${PACKAGE_TARNAME}'
@@ -1087,15 +1075,6 @@ do
   | -silent | --silent | --silen | --sile | --sil)
     silent=yes ;;
 
-  -runstatedir | --runstatedir | --runstatedi | --runstated \
-  | --runstate | --runstat | --runsta | --runst | --runs \
-  | --run | --ru | --r)
-    ac_prev=runstatedir ;;
-  -runstatedir=* | --runstatedir=* | --runstatedi=* | --runstated=* \
-  | --runstate=* | --runstat=* | --runsta=* | --runst=* | --runs=* \
-  | --run=* | --ru=* | --r=*)
-    runstatedir=$ac_optarg ;;
-
   -sbindir | --sbindir | --sbindi | --sbind | --sbin | --sbi | --sb)
     ac_prev=sbindir ;;
   -sbindir=* | --sbindir=* | --sbindi=* | --sbind=* | --sbin=* \
@@ -1233,7 +1212,7 @@ fi
 for ac_var in	exec_prefix prefix bindir sbindir libexecdir datarootdir \
 		datadir sysconfdir sharedstatedir localstatedir includedir \
 		oldincludedir docdir infodir htmldir dvidir pdfdir psdir \
-		libdir localedir mandir runstatedir
+		libdir localedir mandir
 do
   eval ac_val=\$$ac_var
   # Remove trailing slashes.
@@ -1386,7 +1365,6 @@ Fine tuning of the installation directories:
   --sysconfdir=DIR        read-only single-machine data [PREFIX/etc]
   --sharedstatedir=DIR    modifiable architecture-independent data [PREFIX/com]
   --localstatedir=DIR     modifiable single-machine data [PREFIX/var]
-  --runstatedir=DIR       modifiable per-process data [LOCALSTATEDIR/run]
   --libdir=DIR            object code libraries [EPREFIX/lib]
   --includedir=DIR        C header files [PREFIX/include]
   --oldincludedir=DIR     C header files for non-gcc [/usr/include]
@@ -1441,10 +1419,6 @@ Optional Features:
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
-  --with-apr=PATH         prefix for installed APR or the full path to
-                             apr-config
-  --with-apr-util=PATH    prefix for installed APU or the full path to
-                             apu-config
   --with-pic[=PKGS]       try to use only PIC/non-PIC objects [default=use
                           both]
   --with-gnu-ld           assume the C compiler uses GNU ld [default=no]
@@ -4481,256 +4455,6 @@ unknown)
   as_fn_error $? "could not determine $AR interface" "$LINENO" 5
   ;;
 esac
-
-
-
-
-
-
-
-
-APACHE2_INCLUDES=-I/usr/include/apache2
-
-
-
-
-  apr_found="no"
-
-  if test "$target_os" = "os2-emx"; then
-    # Scripts don't pass test -x on OS/2
-    TEST_X="test -f"
-  else
-    TEST_X="test -x"
-  fi
-
-  acceptable_majors="1"
-
-  apr_temp_acceptable_apr_config=""
-  for apr_temp_major in $acceptable_majors
-  do
-    case $apr_temp_major in
-      0)
-      apr_temp_acceptable_apr_config="$apr_temp_acceptable_apr_config apr-config"
-      ;;
-      *)
-      apr_temp_acceptable_apr_config="$apr_temp_acceptable_apr_config apr-$apr_temp_major-config"
-      ;;
-    esac
-  done
-
-  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for APR" >&5
-$as_echo_n "checking for APR... " >&6; }
-
-# Check whether --with-apr was given.
-if test "${with_apr+set}" = set; then :
-  withval=$with_apr;
-    if test "$withval" = "no" || test "$withval" = "yes"; then
-      as_fn_error $? "--with-apr requires a directory or file to be provided" "$LINENO" 5
-    fi
-
-    for apr_temp_apr_config_file in $apr_temp_acceptable_apr_config
-    do
-      for lookdir in "$withval/bin" "$withval"
-      do
-        if $TEST_X "$lookdir/$apr_temp_apr_config_file"; then
-          apr_config="$lookdir/$apr_temp_apr_config_file"
-
-          apr_found="yes"
-          break 2
-        fi
-      done
-    done
-
-    if test "$apr_found" != "yes" && $TEST_X "$withval" && $withval --help > /dev/null 2>&1 ; then
-      apr_config="$withval"
-      apr_found="yes"
-    fi
-
-            if test "$apr_found" != "yes"; then
-      as_fn_error $? "the --with-apr parameter is incorrect. It must specify an install prefix, a build directory, or an apr-config file." "$LINENO" 5
-    fi
-
-else
-
-        if test -n "1" && test "1" = "1"; then
-      for apr_temp_apr_config_file in $apr_temp_acceptable_apr_config
-      do
-        if $apr_temp_apr_config_file --help > /dev/null 2>&1 ; then
-          apr_config="$apr_temp_apr_config_file"
-
-          apr_found="yes"
-          break
-        else
-                    for lookdir in /usr /usr/local /usr/local/apr /opt/apr; do
-            if $TEST_X "$lookdir/bin/$apr_temp_apr_config_file"; then
-              apr_config="$lookdir/bin/$apr_temp_apr_config_file"
-
-              apr_found="yes"
-              break 2
-            fi
-          done
-        fi
-      done
-    fi
-        if test "$apr_found" = "no" && test -d ""; then
-      apr_temp_abs_srcdir="`cd \"\" && pwd`"
-      apr_found="reconfig"
-      apr_bundled_major="`sed -n '/#define.*APR_MAJOR_VERSION/s/^[^0-9]*\([0-9]*\).*$/\1/p' \"/include/apr_version.h\"`"
-      case $apr_bundled_major in
-        "")
-          as_fn_error $? "failed to find major version of bundled APR" "$LINENO" 5
-        ;;
-        0)
-          apr_temp_apr_config_file="apr-config"
-        ;;
-        *)
-          apr_temp_apr_config_file="apr-$apr_bundled_major-config"
-        ;;
-      esac
-      if test -n ""; then
-        apr_config="/$apr_temp_apr_config_file"
-      else
-        apr_config="/$apr_temp_apr_config_file"
-      fi
-    fi
-
-fi
-
-
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $apr_found" >&5
-$as_echo "$apr_found" >&6; }
-
-
-	if ! test "$apr_found" = "yes"; then
-		as_fn_error $? "no apache runtime libraries" "$LINENO" 5
-	fi
-	APR_INCLUDES=`$apr_config --includes`
-	APR_CXXFLAGS=`$apr_config --cppflags`
-	APR_LIBS=`$apr_config --link-libtool --libs`
-	APR_LDFLAGS=`$apr_config --ldflags`
-
-
-
-
-
-
-
-
-  apu_found="no"
-
-  if test "$target_os" = "os2-emx"; then
-    # Scripts don't pass test -x on OS/2
-    TEST_X="test -f"
-  else
-    TEST_X="test -x"
-  fi
-
-  acceptable_majors="1"
-
-  apu_temp_acceptable_apu_config=""
-  for apu_temp_major in $acceptable_majors
-  do
-    case $apu_temp_major in
-      0)
-      apu_temp_acceptable_apu_config="$apu_temp_acceptable_apu_config apu-config"
-      ;;
-      *)
-      apu_temp_acceptable_apu_config="$apu_temp_acceptable_apu_config apu-$apu_temp_major-config"
-      ;;
-    esac
-  done
-
-  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for APR-util" >&5
-$as_echo_n "checking for APR-util... " >&6; }
-
-# Check whether --with-apr-util was given.
-if test "${with_apr_util+set}" = set; then :
-  withval=$with_apr_util;
-    if test "$withval" = "no" || test "$withval" = "yes"; then
-      as_fn_error $? "--with-apr-util requires a directory or file to be provided" "$LINENO" 5
-    fi
-
-    for apu_temp_apu_config_file in $apu_temp_acceptable_apu_config
-    do
-      for lookdir in "$withval/bin" "$withval"
-      do
-        if $TEST_X "$lookdir/$apu_temp_apu_config_file"; then
-          apu_config="$lookdir/$apu_temp_apu_config_file"
-
-          apu_found="yes"
-          break 2
-        fi
-      done
-    done
-
-    if test "$apu_found" != "yes" && $TEST_X "$withval" && $withval --help > /dev/null 2>&1 ; then
-      apu_config="$withval"
-      apu_found="yes"
-    fi
-
-            if test "$apu_found" != "yes"; then
-      as_fn_error $? "the --with-apr-util parameter is incorrect. It must specify an install prefix, a build directory, or an apu-config file." "$LINENO" 5
-    fi
-
-else
-
-    if test -n "1" && test "1" = "1"; then
-      for apu_temp_apu_config_file in $apu_temp_acceptable_apu_config
-      do
-        if $apu_temp_apu_config_file --help > /dev/null 2>&1 ; then
-          apu_config="$apu_temp_apu_config_file"
-
-          apu_found="yes"
-          break
-        else
-                    for lookdir in /usr /usr/local /usr/local/apr /opt/apr; do
-            if $TEST_X "$lookdir/bin/$apu_temp_apu_config_file"; then
-              apu_config="$lookdir/bin/$apu_temp_apu_config_file"
-
-              apu_found="yes"
-              break 2
-            fi
-          done
-        fi
-      done
-    fi
-        if test "$apu_found" = "no" && test -d ""; then
-      apu_temp_abs_srcdir="`cd \"\" && pwd`"
-      apu_found="reconfig"
-      apu_bundled_major="`sed -n '/#define.*APU_MAJOR_VERSION/s/^[^0-9]*\([0-9]*\).*$/\1/p' \"/include/apu_version.h\"`"
-      case $apu_bundled_major in
-        "")
-          as_fn_error $? "failed to find major version of bundled APU" "$LINENO" 5
-        ;;
-        0)
-          apu_temp_apu_config_file="apu-config"
-        ;;
-        *)
-          apu_temp_apu_config_file="apu-$apu_bundled_major-config"
-        ;;
-      esac
-      if test -n ""; then
-        apu_config="/$apu_temp_apu_config_file"
-      else
-        apu_config="/$apu_temp_apu_config_file"
-      fi
-    fi
-
-fi
-
-
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $apu_found" >&5
-$as_echo "$apu_found" >&6; }
-
-
-	if ! test "$apu_found" = "yes"; then
-		as_fn_error $? "no pache utils libraries" "$LINENO" 5
-	fi
-	APU_INCLUDES=`$apu_config --includes`
-	APU_LIBS=`$apu_config --link-libtool --libs`
-	APU_LDFLAGS=`$apu_config --ldflags`
-
-
 
 
 
