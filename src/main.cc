@@ -20,10 +20,10 @@ static unsigned int field = 0;
 static unsigned int data_field = 0;	// field to match
 static char match[10]; // string to match. ex: false, true, 200, 500
 static uint64_t step = 5000;
-static bool relative = true;
-static bool count_flag = true;	// flag to count number of occurences (default)
-static bool avg_flag = false;	// calculate average and std deviance
-static bool stddev_flag = false;	// calculate variance and standard deviation
+static bool relative = false;
+static int count_flag = 0;	// flag to count number of occurences (default)
+static int avg_flag = 0;	// calculate average and std deviance
+static int stddev_flag = 1;	// calculate variance and standard deviation
 static std::atomic<uint64_t> total_samples(0);
 static std::atomic<uint64_t> total_data(0);
 
@@ -78,8 +78,8 @@ static bool readline(char *buf, std::size_t n, std::istream& f);
 static void parse_line(const char *buf, std::size_t n);
 static void print_result();
 
-int
-main(int argc, char *argv[]) {
+
+int main(int argc, char *argv[]) {
 	parse_cmd_line(argc, argv);
 	std::cin.exceptions(std::istream::badbit);
 	try {
@@ -102,21 +102,19 @@ parse_cmd_line(int argc, char *argv[]) {
 	char c;
 	static struct option long_options[] = {
             /* These options set a flag. */
-            {"count",   no_argument,        &count_flag, 1},
-            {"avg",     no_argument,        &avg_flag, 0},
-            {"stddev",  no_argument,        &stddev_flag, 0},
-            {"all",     no_argument,        &relative, 1},
+            {"count",   no_argument,        &count_flag,    1},
+            {"avg",     no_argument,        &avg_flag,      0},
+            {"stddev",  no_argument,        &stddev_flag,   0},
             /* These options don’t set a flag.
              We distinguish them by their indices. */
-            {"help",    no_argument,        0, 'h'},
-            {"thread",  required_argument,  0, 't'},
-            {"data",    required_argument,  0, 'd'},
-            {"match",   required_argument,  0, 'm'},
-            {"field",   required_argument,  0, 'f'},
-            {"field",   required_argument,  0, 'f'},
-            {"field",   required_argument,  0, 'f'},
-            {"field",   required_argument,  0, 'f'},
-            {0,         0,                  0,  0}
+            {"help",    no_argument,        0,              'h'},
+            {"all",     no_argument,        0,              'a'},
+            {"thread",  required_argument,  0,              't'},
+            {"dataidx", required_argument,  0,              'd'},
+            {"match",   required_argument,  0,              'm'},
+            {"field",   required_argument,  0,              'f'},
+            {"step",    required_argument,  0,              's'},
+            {0,         0,                  0,                  0}
         };
         /* getopt_long stores the option index here. */
         int option_index = 0;
@@ -196,7 +194,7 @@ parse_cmd_line(int argc, char *argv[]) {
                                             usage(argv[0]);
                                             exit(1);
                                     }
-                                    strcpy(optarg,match,10);
+                                    strcpy(optarg,match);
                         break;
                     }
 		case 's': {
