@@ -7,6 +7,7 @@
 #include <fstream>
 #include <cstdlib>
 #include <unistd.h>
+#include <getopt.h>
 #include <atomic>
 #include <vector>
 
@@ -99,27 +100,33 @@ main(int argc, char *argv[]) {
 static void
 parse_cmd_line(int argc, char *argv[]) {
 	char c;
-	static struct option long_options[] =
-        {
-          /* These options set a flag. */
-          {"count", no_argument,       &count_flag, true},
-          {"avg",   no_argument,       &avg_flag, false},
-		  {"stddev",   no_argument,    &stddev_flag, false},
-		  {"all",   no_argument,  &relative, true},
-          /* These options don’t set a flag.
+	static struct option long_options[] = {
+            /* These options set a flag. */
+            {"count",   no_argument,        &count_flag, 1},
+            {"avg",     no_argument,        &avg_flag, 0},
+            {"stddev",  no_argument,        &stddev_flag, 0},
+            {"all",     no_argument,        &relative, 1},
+            /* These options don’t set a flag.
              We distinguish them by their indices. */
-          {"help",    no_argument,       0, 'h'},
-          {"thread",  required_argument, 0, 't'},
-          {"data",  required_argument, 0, 'd'},
-          {"match",  required_argument, 0, 'm'},
-          {"field",    required_argument, 0, 'f'},
-		  {"field",    required_argument, 0, 'f'},
-		  {"field",    required_argument, 0, 'f'},
-		  {"field",    required_argument, 0, 'f'},
-          {0, 0, 0, 0}
+            {"help",    no_argument,        0, 'h'},
+            {"thread",  required_argument,  0, 't'},
+            {"data",    required_argument,  0, 'd'},
+            {"match",   required_argument,  0, 'm'},
+            {"field",   required_argument,  0, 'f'},
+            {"field",   required_argument,  0, 'f'},
+            {"field",   required_argument,  0, 'f'},
+            {"field",   required_argument,  0, 'f'},
+            {0,         0,                  0,  0}
         };
-	while ((c = getopt(argc, argv, "hat:d:m:f:s:i:")) != EOF)
+        /* getopt_long stores the option index here. */
+        int option_index = 0;
+	while ((c = getopt_long(argc, argv, "hat:d:m:f:s:i:", long_options, &option_index)) != EOF)
 		switch (c) {
+                case 0:
+                        /* If this option set a flag, do nothing else now. */
+                        if (long_options[option_index].flag != 0)
+                          break;
+                        break;
 		case 'h':
 			usage(argv[0]);
 			exit(0);
@@ -161,37 +168,37 @@ parse_cmd_line(int argc, char *argv[]) {
 			break;
 		}
 		case 'd': {
-            if (nullptr == optarg) {
-                std::cerr << "-d must be followed by the data field index" << std::endl;
-                usage(argv[0]);
-                exit(1);
-            }
-            errno = 0;
-            char *endp;
-            long n = strtol(optarg, &endp, 10);
-            if (0 != errno || '\0' != *endp || n < 0) {
-                std::cerr << "The field index must be a positive integer" << std::endl;
-                usage(argv[0]);
-                exit(1);
-            }
-            data_field = n;
-            break;
-        }
-        case 'm': {
-            if (nullptr == optarg) {
-                std::cerr << "-m must be followed by the string to match" << std::endl;
-                usage(argv[0]);
-                exit(1);
-            }
-            errno = 0;
-			if(strlen(optarg) > 10) {
-				std::cerr << "-m argument must have less than 9 characters" << std::endl;
-				usage(argv[0]);
-				exit(1);
-			}
-			strcpy(optarg,match,10)
-            break;
-        }
+                        if (nullptr == optarg) {
+                            std::cerr << "-d must be followed by the data field index" << std::endl;
+                            usage(argv[0]);
+                            exit(1);
+                        }
+                        errno = 0;
+                        char *endp;
+                        long n = strtol(optarg, &endp, 10);
+                        if (0 != errno || '\0' != *endp || n < 0) {
+                            std::cerr << "The field index must be a positive integer" << std::endl;
+                            usage(argv[0]);
+                            exit(1);
+                        }
+                        data_field = n;
+                        break;
+                    }
+                    case 'm': {
+                        if (nullptr == optarg) {
+                            std::cerr << "-m must be followed by the string to match" << std::endl;
+                            usage(argv[0]);
+                            exit(1);
+                        }
+                        errno = 0;
+                                    if(strlen(optarg) > 10) {
+                                            std::cerr << "-m argument must have less than 9 characters" << std::endl;
+                                            usage(argv[0]);
+                                            exit(1);
+                                    }
+                                    strcpy(optarg,match,10);
+                        break;
+                    }
 		case 's': {
 			if (nullptr == optarg) {
 				std::cerr << "-s must be followed by the step of the histogram" << std::endl;
@@ -209,18 +216,6 @@ parse_cmd_line(int argc, char *argv[]) {
 			step = n;
 			break;
 		}
-		// case 'i':
-		// 	if (nullptr == optarg || '\0' == *optarg) {
-		// 		std::cerr << "-i must be followed by the time interval of interest" << std::endl;
-		// 		usage(argv[0]);
-		// 		exit(1);
-		// 	}
-		// 	if (!parse_interval(optarg)) {
-		// 		std::cerr << "Invalid interval: " << optarg << std::endl;
-		// 		usage(argv[0]);
-		// 		exit(1);
-		// 	}
-		// 	break;
 		case '?':
 		default:
 			usage(argv[0]);
